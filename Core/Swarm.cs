@@ -1,17 +1,18 @@
 ﻿// Swarm.cs
-using OpenAI_API;
-using OpenAI_API.Chat;
+using OpenAI;
+using OpenAI.Chat;
+
+
 
 namespace SwarmSharp.Core
 {
     public class Swarm
     {
-        private OpenAIAPI _client;
+        private ChatClient _client;
 
-        public Swarm(OpenAIAPI client = null)
+        public Swarm(ChatClient client = null)
         {
-            // Replace "your-api-key" with your actual OpenAI API key
-            _client = client ?? new OpenAIAPI(Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
+            _client = client ?? new ChatClient(model: "gpt-4", apiKey: Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
         }
 
         public async Task<Response> Run(
@@ -28,24 +29,21 @@ namespace SwarmSharp.Core
             var history = new List<ChatMessage>();
 
             // Add system message with instructions
-            string instructions;
-            if (agent.InstructionsDelegate != null)
-            {
-                instructions = agent.InstructionsDelegate(contextVars);
-            }
-            else
-            {
-                instructions = agent.Instructions;
-            }
+            string instructions = agent.InstructionsDelegate != null
+                ? agent.InstructionsDelegate(contextVars)
+                : agent.Instructions;
 
-            history.Add(new ChatMessage(ChatMessageRole.System, instructions));
+            history.Add(new SystemChatMessage(instructions));
 
             // Add previous messages
             foreach (var msgDict in messages)
             {
-                var role = msgDict["role"] == "user" ? ChatMessageRole.User : ChatMessageRole.Assistant;
+                var role = msgDict["role"];
                 var content = msgDict["content"];
-                history.Add(new ChatMessage(role, content));
+                if (role == "user")
+                    history.Add(new UserChatMessage(content));
+                else
+                    history.Add(new AssistantChatMessage(content));
             }
 
             // Check and execute agent functions
@@ -59,26 +57,36 @@ namespace SwarmSharp.Core
                 }
             }
 
-            var chatRequest = new ChatRequest
+            // Update the client model if a model override is provided
+            if (modelOverride != null)
             {
-                Messages = history,
-                Model = modelOverride ?? agent.Model
-            };
+                _client = new ChatClient(model: modelOverride, apiKey: Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
+            }
 
-            var chatResult = await _client.Chat.CreateChatCompletionAsync(chatRequest);
+            // Create the chat completion
+            ChatCompletion completion;
+            if (stream)
+            {
+                // Handle streaming response
+                completion = await _client.CompleteChatAsync(history); // Modify as per streaming requirements
+            }
+            else
+            {
+                completion = await _client.CompleteChatAsync(history);
+            }
 
-            var responseMessage = chatResult.Choices[0].Message;
+            var responseMessage = completion.Content[0].Text;
 
             var response = new Response
             {
                 Messages = new List<Message>
+        {
+            new Message
             {
-                new Message
-                {
-                    Role = responseMessage.Role.ToString().ToLower(),
-                    Content = responseMessage.Content
-                }
-            },
+                Role = "assistant",
+                Content = responseMessage
+            }
+        },
                 Agent = agent,
                 ContextVariables = contextVars
             };
@@ -86,6 +94,6 @@ namespace SwarmSharp.Core
             return response;
         }
 
+
     }
 }
-
