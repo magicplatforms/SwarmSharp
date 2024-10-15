@@ -47,9 +47,19 @@ namespace SwarmSharp.Core
             }
 
             // Check and execute agent functions
-            foreach (var function in agent.Functions)
+            foreach (var function in agent.Functions2)
             {
                 var result = function();
+                if (result.Agent != null)
+                {
+                    // Transfer to the new agent
+                    return await Run(result.Agent, messages, contextVariables, modelOverride, stream, debug, maxTurns, executeTools);
+                }
+            }
+
+            foreach (var function in agent.Functions)
+            {
+                var result = function(contextVariables);
                 if (result.Agent != null)
                 {
                     // Transfer to the new agent
@@ -94,6 +104,9 @@ namespace SwarmSharp.Core
             return response;
         }
 
-
+        public async Task Run(Agent agent, object value, List<Dictionary<string, string>> messages, Dictionary<string, string> contextVariables)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

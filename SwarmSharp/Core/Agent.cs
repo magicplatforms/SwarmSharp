@@ -13,7 +13,8 @@ namespace SwarmSharp.Core
         public string Model { get; set; } = "gpt-4";
         public string Instructions { get; set; } = "You are a helpful agent.";
         public Func<Dictionary<string, string>, string> InstructionsDelegate { get; set; } = null;
-        public List<Func<Result>> Functions { get; set; } = new List<Func<Result>>();
+         public List<Func<Result>> Functions2 { get; set; } = new List<Func<Result>>();
+        public List<Func<Dictionary<string, string>, Result>> Functions { get; set; } = new List<Func<Dictionary<string, string>, Result>>();
         public string ToolChoice { get; set; } = null;
         public bool ParallelToolCalls { get; set; } = true;
 
@@ -22,5 +23,7 @@ namespace SwarmSharp.Core
             Name = name;
             Instructions = instructions;
         }
+
+ 
     }
 }

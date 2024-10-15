@@ -49,7 +49,7 @@ namespace SwarmApp
                 return new Result { Agent = spanish_agent };
             };
 
-            english_agent.Functions.Add(transferToSpanishAgent);
+            english_agent.Functions2.Add(transferToSpanishAgent);
 
             var response = await client.Run(english_agent, messages);
 
