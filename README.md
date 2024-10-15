@@ -6,6 +6,16 @@ SwarmSharp is a basic toolkit for .NET developers diving into the world of multi
 - Educational Focus: Designed as a learning tool for developers interested in multi-agent systems within the .NET framework.
 - Customizable Architecture: Allows for easy modification and extension to suit specific project needs.
 
+Consider this your cheat sheet for applying the video's advice: 
+1. Understand routines: Define clear steps for your agents to follow, like a to-do list.
+2. Implement handoffs: Enable agents to seamlessly transfer conversations to other specialized agents.
+3. Utilize agents: Treat them as specialized workers with unique skills.
+4. Leverage tools: Equip your agents with tools that extend their capabilities.
+5. Inject context: Personalize interactions by providing agents with relevant user data.
+6. Explore the SwarmSharp GitHub repository: Dive into the code, examples, and documentation.
+7. Experiment: Find recipes and examples for building with OpenAI APIs.
+
+
 Based off of the OpenAI Swarm Project located here: https://github.com/openai/swarm
 
 # Usage
