@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\repok\SwarmSharp.csproj" />
+    <ProjectReference Include="..\SwarmSharp.Core\SwarmSharp.Core.csproj" />
   </ItemGroup>
 
 </Project>
